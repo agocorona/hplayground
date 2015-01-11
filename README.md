@@ -87,7 +87,8 @@ install the [ghc compiler](http://www.haskell.org/platform/)
 install Haste:
 
     >cabal install haste-compiler
-
+    >haste-boot
+    
 install perch
 
     >haste-inst install haste-perch
