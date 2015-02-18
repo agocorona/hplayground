@@ -75,7 +75,7 @@ import Data.Typeable
 
 import Unsafe.Coerce
 import Data.Maybe
-import Haste
+import Haste hiding (attr)
 import Haste.Prim
 import Haste.Foreign
 import Haste.JSON hiding ((!))
