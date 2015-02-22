@@ -115,7 +115,7 @@ newtype View v m a = View { runView :: WState v m (FormElm v a)}
 
 mFlowState0= MFlowState "" 0 NoElems  (EventF (return Nothing)
                         (const (return Nothing)) ) False
-                        (toDyn $toDyn $ EventData "OnLoad" NoData)
+                        (toDyn $ EventData "OnLoad" NoData)
                         M.empty
 
 noid= error "noId error"
