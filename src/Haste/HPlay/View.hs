@@ -115,7 +115,7 @@ newtype View v m a = View { runView :: WState v m (FormElm v a)}
 
 mFlowState0= MFlowState "" 0 NoElems  (EventF (return Nothing)
                         (const (return Nothing)) ) False
-                        (toDyn $ EventData "OnLoad" NoData)
+                        (toDyn $toDyn $ EventData "OnLoad" NoData)
                         M.empty
 
 noid= error "noId error"
@@ -408,7 +408,7 @@ fromValidated (Validated x)= x
 fromValidated NoParam= error $ "fromValidated : NoParam"
 fromValidated (NotValidated s err)= error $ "fromValidated: NotValidated "++ s
 
-getParam1 :: (Functor m, MonadIO m, MonadState  m, Typeable a, Read a, FormInput v)
+getParam1 :: (MonadIO m, MonadState  m, Typeable a, Read a, FormInput v)
           => String ->  m (ParamResult v a)
 getParam1 par = do
    me <- elemById par
@@ -492,51 +492,51 @@ getNextId=  do
 
 
 -- | Display a text box and return a non empty String
-getString  :: (StateType (View view m) ~ MFlowState,FormInput view,Monad(View view m), Functor m, MonadIO m) =>
+getString  :: (StateType (View view m) ~ MFlowState,FormInput view,Monad(View view m),MonadIO m) =>
      Maybe String -> View view m String
 getString ms = getTextBox ms
 --     `validate`
 --     \s -> if Prelude.null s then return (Just $ fromStr "")
 --                    else return Nothing
 
-inputString  :: (StateType (View view m) ~ MFlowState,FormInput view,Monad(View view m), Functor m, MonadIO m) =>
+inputString  :: (StateType (View view m) ~ MFlowState,FormInput view,Monad(View view m),MonadIO m) =>
      Maybe String -> View view m String
 inputString= getString
 
 -- | Display a text box and return an Integer (if the value entered is not an Integer, fails the validation)
-getInteger :: (StateType (View view m) ~ MFlowState,FormInput view,  Functor m, MonadIO m) =>
+getInteger :: (StateType (View view m) ~ MFlowState,FormInput view,  MonadIO m) =>
      Maybe Integer -> View view m  Integer
 getInteger =  getTextBox
 
-inputInteger :: (StateType (View view m) ~ MFlowState,FormInput view, Functor m, MonadIO m) =>
+inputInteger :: (StateType (View view m) ~ MFlowState,FormInput view,  MonadIO m) =>
      Maybe Integer -> View view m  Integer
 inputInteger= getInteger
 
 -- | Display a text box and return a Int (if the value entered is not an Int, fails the validation)
-getInt :: (StateType (View view m) ~ MFlowState,FormInput view, Functor m, MonadIO m) =>
+getInt :: (StateType (View view m) ~ MFlowState,FormInput view, MonadIO m) =>
      Maybe Int -> View view m Int
 getInt =  getTextBox
 
-inputInt :: (StateType (View view m) ~ MFlowState,FormInput view, Functor m, MonadIO m) =>
+inputInt :: (StateType (View view m) ~ MFlowState,FormInput view, MonadIO m) =>
      Maybe Int -> View view m Int
 inputInt =  getInt
 
-inputFloat :: (StateType (View view m) ~ MFlowState,FormInput view, Functor m, MonadIO m) =>
+inputFloat :: (StateType (View view m) ~ MFlowState,FormInput view, MonadIO m) =>
      Maybe Float -> View view m Float
 inputFloat =  getTextBox
 
-inputDouble :: (StateType (View view m) ~ MFlowState,FormInput view, Functor m, MonadIO m) =>
+inputDouble :: (StateType (View view m) ~ MFlowState,FormInput view, MonadIO m) =>
      Maybe Double -> View view m Double
 inputDouble =  getTextBox
 
 -- | Display a password box
 getPassword :: (FormInput view,StateType (View view m) ~ MFlowState,
-     Functor m, MonadIO m) =>
+     MonadIO m) =>
      View view m String
 getPassword = getParam Nothing "password" Nothing
 
 inputPassword :: (StateType (View view m) ~ MFlowState,FormInput view,
-     Functor m, MonadIO m) =>
+     MonadIO m) =>
      View view m String
 inputPassword= getPassword
 
@@ -619,7 +619,7 @@ getCheckBoxes w= View $ do
 
 
 
-whidden :: (Functor m, MonadIO m, FormInput v,Read a, Show a, Typeable a) => a -> View v m a
+whidden :: (MonadIO m, FormInput v,Read a, Show a, Typeable a) => a -> View v m a
 whidden x= res where
  res= View $ do
       n <- genNewId
@@ -637,7 +637,6 @@ whidden x= res where
 
 getTextBox
   :: (FormInput view, StateType (View view m) ~ MFlowState,
-      Functor m,
       MonadIO  m,
       Typeable a,
       Show a,
@@ -648,7 +647,6 @@ getTextBox ms  = getParam Nothing "text" ms
 
 getParam
   :: (FormInput view,StateType (View view m) ~ MFlowState,
-      Functor m,
       MonadIO m,
       Typeable a,
       Show a,
@@ -679,9 +677,8 @@ getParamS look type1 mvalue= do
 
 
 -- | Display a multiline text box and return its content
-getMultilineText :: (FormInput view,
-                     Functor m,
-                     MonadIO m)
+getMultilineText :: (FormInput view
+                 ,  MonadIO m)
                    => String
                  ->  View view m String
 getMultilineText nvalue = res where
@@ -697,9 +694,8 @@ getMultilineText nvalue = res where
     typef = undefined
 
 -- | A synonim of getMultilineText
-textArea :: (FormInput view,
-                    Functor m,
-                    MonadIO m)
+textArea :: (FormInput view
+                 ,  MonadIO m)
                    => String
                  ->  View view m String
 textArea= getMultilineText
@@ -718,7 +714,7 @@ getBool mv truestr falsestr= do
 -- | Display a dropdown box with the options in the first parameter is optionally selected
 -- . It returns the selected option.
 getSelect :: (FormInput view,
-      Functor m, MonadIO m,Typeable a, Read a) =>
+      MonadIO m,Typeable a, Read a) =>
       View view m (MFOption a) ->  View view m  a
 getSelect opts = res where
   res= View $ do
@@ -790,11 +786,11 @@ inputReset= resetButton
 
 -- passive submit button. Submit a form, but it is not trigger any event.
 -- Unless you attach it with `trigger`
-submitButton :: (Monad (View view m),StateType (View view m) ~ MFlowState,FormInput view, Functor m, MonadIO m) => String -> View view m String
+submitButton :: (Monad (View view m),StateType (View view m) ~ MFlowState,FormInput view, MonadIO m) => String -> View view m String
 submitButton label=  getParam Nothing "submit" $ Just label
 
 
-inputSubmit :: (Monad (View view m),StateType (View view m) ~ MFlowState,FormInput view, Functor m, MonadIO m) => String -> View view m String
+inputSubmit :: (Monad (View view m),StateType (View view m) ~ MFlowState,FormInput view, MonadIO m) => String -> View view m String
 inputSubmit= submitButton
 
 -- | active button. When clicked, return the first parameter
@@ -1274,22 +1270,21 @@ at id method w= View $ do
  where
  set render= liftIO $  case method of
              Insert -> do
-                     clearChildren e
-                     forElems' id render
+                     forElems' id $ clear >> render
                      return ()
              Append -> do
-                     forElems id render
+                     forElems' id render
                      return ()
              Prepend -> do
-                    forElems' id  $ \e -> do
+                    forElems' id  $ Perch $ \e -> do
                      es <- getChildren e
                      case es of
-                       [] -> buil render e >> return ()
+                       [] -> build render e >> return e
                        e':es -> do
                              span <- newElem "span"
                              addChildBefore span e e'
                              build render span
-                             return()
+                             return e
 
 -- ajax
 
@@ -1367,5 +1362,11 @@ foreign import ccall ajaxReq :: JSString    -- method
 #else
 ajaxReq= undefined
 #endif
+
+listen :: JSType event => Elem -> event -> a -> IO Bool
+listen e event f= jsSetCB e (toJSString event) (mkCallback $! f)
+
+
+foreign import ccall jsSetCB :: Elem -> JSString -> JSFun a -> IO Bool
 
 
