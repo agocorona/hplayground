@@ -162,19 +162,19 @@ setEventCont x f  id= do
        let idx=  runWidgetId (strip st x) "noid"
        put st{process= EventF idx ( \x ->   runWidgetId ( f x) id `bind` unsafeCoerce fs)  }
    return conf
-   where
-   at id w= View $ do
-      FormElm render mx <- (runView w)
-      return $ FormElm  (set  render)  mx
-      where
-      set render= liftIO $ do
-         me <- elemById id
-         case me of
-          Nothing -> return ()
-          Just e ->  do
-                     clearChildren e
-                     build render e
-                     return ()
+--   where
+--   at id w= View $ do
+--      FormElm render mx <- (runView w)
+--      return $ FormElm  (set  render)  mx
+--      where
+--      set render= liftIO $ do
+--         me <- elemById id
+--         case me of
+--          Nothing -> return ()
+--          Just e ->  do
+--                     clearChildren e
+--                     build render e
+--                     return ()
 
 
 resetEventCont cont= modify $ \s -> s {process= cont}
@@ -793,14 +793,14 @@ submitButton label=  getParam Nothing "submit" $ Just label
 inputSubmit :: (Monad (View view m),StateType (View view m) ~ MFlowState,FormInput view, MonadIO m) => String -> View view m String
 inputSubmit= submitButton
 
--- | active button. When clicked, return the label value
+-- | active button. When clicked, return the first parameter
 wbutton :: a -> String -> Widget a
 wbutton x label= static $ do
-        input  ! atr "type" "submit" ! atr "value" label `pass` OnClick
+        input  ! atr "type" "submit" ! id label ! atr "value" label `pass` OnClick
         return x
+      `continuePerch`  label
 
-
-
+-- | when creating a complex widget with many tags, this call indentifies which tag will receive the attributes of the (!) operator.
 continuePerch :: Widget a -> ElemID -> Widget a
 continuePerch w eid= View $ do
       FormElm f mx <- runView w
@@ -1263,27 +1263,24 @@ data UpdateMethod= Append | Prepend | Insert deriving Show
 -- | Run the widget as the content of the element with the given id. The content can
 -- be appended, prepended to the previous content or it can be the only content depending on the
 -- update method.
-at :: ElemID -> UpdateMethod -> Widget a -> Widget  a
+at ::  String -> UpdateMethod -> Widget a -> Widget  a
 at id method w= View $ do
  FormElm render mx <- (runView w)
  return $ FormElm  (set  render)  mx
  where
- set render= liftIO $ do
-         me <- elemById id
-         case me of
-          Nothing -> return ()
-          Just e -> case method of
+ set render= liftIO $  case method of
              Insert -> do
                      clearChildren e
-                     build render e
+                     forElems' id render
                      return ()
              Append -> do
-                     build render e
+                     forElems id render
                      return ()
              Prepend -> do
+                    forElems' id  $ \e -> do
                      es <- getChildren e
                      case es of
-                       [] -> build render e >> return ()
+                       [] -> buil render e >> return ()
                        e':es -> do
                              span <- newElem "span"
                              addChildBefore span e e'
@@ -1294,6 +1291,7 @@ at id method w= View $ do
 
 responseAjax :: IORef [(String,Maybe JSString)]
 responseAjax = unsafePerformIO $ newIORef []
+
 
 -- | Invoke AJAX. `ToJSString` is a class coverter to-from JavaScript strings
 -- `(a,b)` are the lists of parameters, a is normally `String` or `JSString`.
