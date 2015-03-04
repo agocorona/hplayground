@@ -82,12 +82,21 @@ operations with form elements as spreadsheet cells. Currently it is at the begin
 How to run
 ----------
 
+### Docker file
+
+https://registry.hub.docker.com/u/agocorona/tryhplay/
+
+Contains everything necessary to use hplayground
+
+### Install from scratch
+
 install the [ghc compiler](http://www.haskell.org/platform/)
 
 install Haste:
 
     >cabal install haste-compiler
-
+    >haste-boot
+    
 install perch
 
     >haste-inst install haste-perch
