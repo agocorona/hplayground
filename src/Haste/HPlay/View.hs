@@ -40,7 +40,7 @@ resetButton,inputReset, submitButton,
 inputSubmit, wbutton, wlink, noWidget, stop,wraw, isEmpty
 
 -- * out of flow updates
-,at, UpdateMethod(..)
+,at,at', UpdateMethod(..)
 
 -- * Session data storage
 ,getSessionData,getSData,setSessionData,setSData
