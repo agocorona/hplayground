@@ -1264,7 +1264,12 @@ data UpdateMethod= Append | Prepend | Insert deriving Show
 -- be appended, prepended to the previous content or it can be the only content depending on the
 -- update method.
 at ::  String -> UpdateMethod -> Widget a -> Widget  a
-at id method w= View $ do
+at ident= at' ('#':ident)
+
+-- A generalized version of `at` that include the widget rendering at the elements that meet the selector criteria
+-- (the first parameter) in the style of jQuery. the selector can match  classes etc not only identifiers.
+at' ::  String -> UpdateMethod -> Widget a -> Widget  a
+at' id method w= View $ do
  FormElm render mx <- (runView w)
  return $ FormElm  (set  render)  mx
  where
