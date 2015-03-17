@@ -109,7 +109,6 @@ wsOpen url = View $ do
     where
     news :: URL
          -> WSComputation
-    --     -> WSOnError
          -> IO ()
     news= ffi $  "(function(url,f){\
              \var ws = new WebSocket(url);\
