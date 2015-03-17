@@ -27,7 +27,8 @@ library
 
     if flag(haste-inst)
         build-depends: base >4.0 && <5, transformers -any, containers -any,
-                       data-default -any, monads-tf -any, haste-lib -any, haste-perch  >= 0.1.0.5
+                       data-default -any, monads-tf -any, haste-lib -any,
+                       haste-perch  >= 0.1.0.5
         exposed: True
         buildable: True
     else

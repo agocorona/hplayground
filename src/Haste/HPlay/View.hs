@@ -1364,14 +1364,16 @@ foreign import ccall ajaxReq :: JSString    -- method
                              -> JSString    -- POST data
                              -> JSFun (Maybe JSString -> IO ())
                              -> IO ()
+foreign import ccall jsSetCB :: Elem -> JSString -> JSFun a -> IO Bool
 #else
 ajaxReq= undefined
+jsSetCB= undefined
 #endif
 
 listen :: JSType event => Elem -> event -> a -> IO Bool
 listen e event f= jsSetCB e (toJSString event) (mkCallback $! f)
 
 
-foreign import ccall jsSetCB :: Elem -> JSString -> JSFun a -> IO Bool
+
 
 
