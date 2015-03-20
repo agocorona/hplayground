@@ -1028,7 +1028,7 @@ resetEventData :: (StateType m ~ MFlowState, MonadState  m) => m ()
 resetEventData=   modify $ \st -> st{ lastEvent= toDyn $ EventData "Onload" NoData}
 
 
-getEventData :: (Typeable a,  StateType m ~ MFlowState, MonadState  m) => m a
+getEventData :: Widget a
 getEventData =  View $ do
        mr <- getMEventData
        return $ FormElm noHtml mr
