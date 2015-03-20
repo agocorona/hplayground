@@ -102,7 +102,7 @@ wsOpen url = View $ do
                              writeIORef rsockets $(id, (ws,Nothing)):wss
                              runCont cont
 
-        liftIO $ news url  onopen -- $ WSOnError $ error "WebSocket closed unexpectedly"
+        liftIO $ news url  onopen 
         return $ FormElm noHtml Nothing
 
 
