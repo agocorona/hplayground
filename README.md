@@ -88,6 +88,18 @@ https://registry.hub.docker.com/u/agocorona/tryhplay/
 
 Contains everything necessary to use hplayground
 
+execute it as:
+
+> sudo docker run -it -p 80:80 agocorona/tryplayg
+
+it run the examples IDE at port 80, where you can also create and compile new programs with a web browser
+
+To access the IDE, in Windows and Mac you can obtain the IP of the docker instance with:
+
+> boot2docker ip
+
+use the IP address as the URL in the browser
+
 ### Install from scratch
 
 install the [ghc compiler](http://www.haskell.org/platform/)
@@ -97,9 +109,6 @@ install Haste:
     >cabal install haste-compiler
     >haste-boot
     
-install perch
-
-    >haste-inst install haste-perch
 
 clone hplayground
 
@@ -115,12 +124,14 @@ install hplayground:
 
     >haste-inst install hplayground
 
+It will install `haste-perch` also
+
 compile
 
     >cd src
     >hastec Main.hs --output-html
 
-hastec uses ghc internally so you can expect ordinary ghc error messages in your development.
+`hastec` uses ghc internally so you can expect ordinary ghc error messages in your development.
 
 Browse the Main.html file. In windows simply execute it in the command line:
 
