@@ -1029,7 +1029,11 @@ resetEventData=   modify $ \st -> st{ lastEvent= toDyn $ EventData "Onload" NoDa
 
 
 getEventData :: (Typeable a,  StateType m ~ MFlowState, MonadState  m) => m a
-getEventData = gets lastEvent >>= return . (flip fromDyn) (error "getEventData: event type not expected")
+getEventData =  View $ do
+       mr <- getMEventData
+       return $ FormElm noHtml mr
+
+-- gets lastEvent >>= return . (flip fromDyn) (error "getEventData: event type not expected")
 
 setEventData ::  (Typeable a, StateType m ~ MFlowState, MonadState  m) => a-> m ()
 setEventData dat=  modify $ \st -> st{ lastEvent= toDyn dat}
