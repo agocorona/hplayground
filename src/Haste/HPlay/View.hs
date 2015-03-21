@@ -218,7 +218,7 @@ static w= View $ do
    modify $ \st -> st{fixed= was}
    return r
 
--- override static locally to permit dynamic effects inside a static widget. It is useful
+-- | override static locally to permit dynamic effects inside a static widget. It is useful
 -- when a monadic Widget computation which perform no rendering changes has a to do some update:
 --
 -- > launchMissiles= static $ do
@@ -1270,7 +1270,7 @@ data UpdateMethod= Append | Prepend | Insert deriving Show
 at ::  String -> UpdateMethod -> Widget a -> Widget  a
 at ident= at' ('#':ident)
 
--- A generalized version of `at` that include the widget rendering at the elements that meet the selector criteria
+-- | A generalized version of `at` that include the widget rendering at the elements that meet the selector criteria
 -- (the first parameter) in the style of jQuery. the selector can match  classes etc not only identifiers.
 at' ::  String -> UpdateMethod -> Widget a -> Widget  a
 at' id method w= View $ do
