@@ -1267,12 +1267,12 @@ data UpdateMethod= Append | Prepend | Insert | Outer deriving Show
 -- | Run the widget as the content of the element with the given id. The content can
 -- be appended, prepended to the previous content or it can be the internal(Insert) or external(Outer) content depending on the
 -- update method.
-at ::  String -> UpdateMethod' -> Widget a -> Widget  a
+at ::  String -> UpdateMethod -> Widget a -> Widget  a
 at ident= at' ('#':ident)
 
 -- | A generalized version of `at` that include the widget rendering at the elements that meet the selector criteria
 -- (the first parameter) in the style of jQuery. the selector can match  classes etc not only identifiers.
-at' ::  String -> UpdateMethod' -> Widget a -> Widget  a
+at' ::  String -> UpdateMethod -> Widget a -> Widget  a
 at' id method w= View $ do
  FormElm render mx <- (runView w)
  return $ FormElm  (set  render)  mx
