@@ -127,18 +127,19 @@ instance (Monoid view) => Monoid (FormElm view a) where
   mempty= FormElm mempty Nothing
   mappend (FormElm f1 x1) (FormElm f2 x2)= FormElm (f1 <> f2) (x1 <|> x2)
 
-instance  (Monad m,Functor m) => Functor (View view m) where
-  fmap f x= View $   fmap (fmap f) $ runView x
+instance  (Monad m,Functor m, Monad(View view m)) => Functor (View view m) where
+  fmap f mx= do -- View $   fmap (fmap f) $ runView mx
+       x <- mx
+       return $ f x
 
-
-instance (Monoid view,Functor m, Monad m) => Applicative (View view m) where
+instance (Monoid view,Functor m, Monad m,Monad (View view m)) => Applicative (View view m) where
   pure a  = View  .  return . FormElm mempty $ Just a
   View f <*> View g= View $
                    f >>= \(FormElm form1 k) ->
                    g >>= \(FormElm form2 x) ->
                    return $ FormElm (form1 `mappend` form2) (k <*> x)
 
-instance (Monoid view, Functor m, Monad m) => Alternative (View view m) where
+instance (Monoid view, Functor m, Monad m,Monad(View view m)) => Alternative (View view m) where
   empty= View $ return $ FormElm mempty Nothing
   View f <|> View g= View $ do
                    FormElm form1 x <- f
@@ -733,7 +734,7 @@ getSelect opts = res where
 
 newtype MFOption a= MFOption a deriving Typeable
 
-instance (FormInput view,Monad m, Functor m) => Monoid (View view m (MFOption a)) where
+instance (FormInput view,Monad m, Functor m,Monad(View view m)) => Monoid (View view m (MFOption a)) where
   mappend =  (<|>)
   mempty = Control.Applicative.empty
 
@@ -827,11 +828,11 @@ wlink x v= static $ do
 
 
 -- | Concat a list of widgets of the same type, return a the first validated result
-firstOf :: (FormInput view, Monad m, Functor m)=> [View view m a]  -> View view m a
+firstOf ::  [Widget a]  -> Widget a
 firstOf xs= Prelude.foldl (<|>) noWidget xs
 
 -- | from a list of widgets, it return the validated ones.
-manyOf :: (FormInput view, MonadIO m, Functor m)=> [View view m a]  -> View view m [a]
+manyOf :: [Widget a]  -> Widget [a]
 manyOf xs=  (View $ do
       forms <- mapM runView  xs
       let vs  = mconcat $ Prelude.map (\(FormElm v _) ->   v) forms
@@ -856,10 +857,9 @@ wprint = wraw . pre
 -- Most of the type errors in the DSL are due to the low priority of this operator.
 --
 
-(<<<) :: (Monad m,  Monoid view)
-          => (view ->view)
-         -> View view m a
-         -> View view m a
+(<<<) :: (Perch ->Perch)
+         -> Widget a
+         -> Widget a
 (<<<) v form= View $ do
   FormElm f mx <- runView form
   return $ FormElm (v  f) mx
@@ -894,8 +894,7 @@ infixr 6 <++
 -- @bold << "enter name" ++> getString Nothing @
 --
 -- It has a infix prority: @infixr 6@ higuer that '<<<' and most other operators
-(++>) :: (Monad m,  Monoid view)
-       => view -> View view m a -> View view m a
+(++>) ::  Perch -> Widget a -> Widget a
 html ++> w =  --  (html <>) <<< digest
  View $ do
   FormElm f mx <- runView w
@@ -926,16 +925,13 @@ instance  Attributable (Widget a) where
 -- | Empty widget that does not validate. May be used as \"empty boxes\" inside larger widgets.
 --
 -- It returns a non valid value.
-noWidget ::  (FormInput view,
-     Monad m, Functor m) =>
-     View view m a
+noWidget ::  Widget a
 noWidget= Control.Applicative.empty
 
 -- | a sinonym of noWidget that can be used in a monadic expression in the View monad. it stop the
 -- computation in the Widget monad.
-stop :: (FormInput view,
-     Monad m, Functor m) =>
-     View view m a
+stop :: 
+     Widget a
 stop= Control.Applicative.empty
 
 
