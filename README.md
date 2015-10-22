@@ -1,5 +1,7 @@
 HPlayground
 ==========
+HPlayground is a subset of [Transient](https://github.com/agocorona/transient) running widgets in the Web browser with the Haste compiler. The widgets are first class, that means that there is an widget algebra using standard haskell combinators.
+
 latest additions:
 
 * [A monad for reactive programming part 2](https://www.fpcomplete.com/user/agocorona/monad-reactive-programming-2) describes the monadic reactive mechanism of hplayground
@@ -18,7 +20,7 @@ and spreadsheet-like behaviours for free.
 So you translate your inputs and outputs from console calls to playground widgets and with no more modifications
 you have reactive and spreadsheet behaviours.
 
-Hplayground uses the same [MFlow](https://github.com/agocorona/MFLow) combinators running in the browser with the Haste compiler
+Hplayground uses the same widgets and combinators used in [MFlow](https://github.com/agocorona/MFLow). MFlow is a server-side framework
 
 This program creates two input boxes and present the sum below them:
 
@@ -35,6 +37,7 @@ This program creates two input boxes and present the sum below them:
                        <*> inputInt Nothing `wake` OnKeyPress <++ br
              p  (show r) ++> noWidget
 
+The coming extension  `applicativeDo` for the GHC compiler will make this syntax much easier.
 Each widget creates his own rendering and manage his own events, that can be propagated
 or not down trough the monadic computation and trigger modifications in the DOM.
 
